@@ -22,7 +22,7 @@ function App() {
   };
   return(
     <div style={{ display: "flex", height: "100%"}}>
-      <Wrapper apiKey={"AIzaSyDhnDPvUSCCA--Oi7dJHW325W23a3BqucI"} render={render}>
+      <Wrapper apiKey={process.env.REACT_APP_API_KEY} render={render}>
         <Map handleClick={handleClick}/>
       </Wrapper>
     </div>
