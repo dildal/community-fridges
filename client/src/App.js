@@ -1,7 +1,10 @@
 import './App.css';
 import { useState, useEffect, useRef } from "react";
 import Map, {Marker, Source, Layer} from 'react-map-gl';
+import { Route, Switch, useParams, Link, useHistory } from "react-router-dom";
 import fridgeIcon from './fridge-svgrepo-com.svg'
+import FridgeDetail from './components/FridgeDetail'
+import HomePage from './components/HomePage';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -10,6 +13,7 @@ function App() {
   // const [newFridgeCoords, setNewFridgeCoords] = useState();
   const [fridges, setFridges] = useState();
   const [geoJson, setGeoJson] = useState();
+  const history = useHistory();
 
 
   useEffect(() => {
@@ -22,7 +26,8 @@ function App() {
             geometry: {
               type: 'Point', 
               coordinates: [fridge.lng, fridge.lat]
-            }
+            },
+            id: fridge.id
           }
         }))
       })
@@ -36,15 +41,6 @@ function App() {
     }
   }
 
-  // const layerStyle = {
-  //   id: 'point',
-  //   type: 'circle',
-  //   paint: {
-  //     'circle-radius': 10,
-  //     'circle-color': '#007cbf'
-  //   }
-  // };
-
   // useEffect(() => {
   //   if (!map.current) return;
   //   map.current.on('click', (e) => {
@@ -55,7 +51,12 @@ function App() {
   //   })
   // })
 
+  function handleClick(e){
+    history.push(`/fridges/${e.features[0].id}`)
+  }
+
   return(
+    <div className="main">
     <div className="map-container">
       <Map
         initialViewState={{
@@ -65,11 +66,24 @@ function App() {
         }}
         mapStyle="mapbox://styles/mddally/ck91ip5tc0s2f1iqipugocf9q"
         mapboxAccessToken={process.env.REACT_APP_API_KEY}
+        interactiveLayerIds={["fridge-icon"]}
+        onClick={(e) => handleClick(e)}
       >
         <Source id="fridge-data" type="geojson" data={{type: 'FeatureCollection', features: geoJson}}>
           <Layer {...layerStyle} />
         </Source>
       </Map>
+      </div>
+      <div className="view-container">
+        <Switch>
+          <Route exact path="/fridges/:id">
+              <FridgeDetail />
+          </Route>
+          <Route path="/">
+            <HomePage />
+          </Route>
+        </Switch>
+      </div>
     </div>
   )
 }
